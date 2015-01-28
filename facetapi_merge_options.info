@@ -1,0 +1,8 @@
+name = Facetapi merge options
+description = Provides a UI that allows a site builder to combine one or more facet results into a single link.
+core = 7.x
+package = Facetapi
+project = facetapi_merge_options
+dependencies[] = facetapi
+
+files[] = plugins/widget_links_merge.inc

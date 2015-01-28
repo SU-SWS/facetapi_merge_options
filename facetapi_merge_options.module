@@ -1,0 +1,118 @@
+<?php
+/**
+ * @file
+ */
+
+include_once "facetapi_merge_options.admin.inc";
+
+/**
+ * Implements hook_help().
+ */
+function facetapi_merge_options_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#facetapi-merge-options':
+      return '<p>' . t('Contact your site administrator') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function facetapi_merge_options_permission() {
+  return array(
+    'administer facetapi merge options' => array(
+      'title' => t('Administer facetapi merge options'),
+      'description' => t('Allow a user to administer the merge options through the user interface'),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+function facetapi_merge_options_menu() {
+  $items['admin/config/search/facetapi/%/%/merge'] = array(
+    'title' => 'Merge facet result options',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('facetapi_merge_options_settings_form', 4, 5),
+    'access arguments' => array('administer facetapi merge options'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_facetapi_widgets()
+ * @return [type] [description]
+ */
+function facetapi_merge_options_facetapi_widgets() {
+  return array(
+    'facetapi_links_merge' => array(
+      'handler' => array(
+        'label' => t('Links merged'),
+        'class' => 'FacetapiWidgetLinksMerge',
+        'query types' => array('term', 'date'),
+      ),
+    ),
+    'facetapi_checkbox_links_merge' => array(
+      'handler' => array(
+        'label' => t('Links with checkboxes merged'),
+        'class' => 'FacetapiWidgetCheckboxLinksMerge',
+        'query types' => array('term', 'date'),
+      ),
+    ),
+  );
+}
+
+/**
+ * [facetapi_merge_options_realm_settings_form_alter description]
+ * @param  [type] $form        [description]
+ * @param  [type] &$form_state [description]
+ * @return [type]              [description]
+ */
+// function facetapi_merge_options_form_facetapi_realm_settings_form_alter(&$form, &$form_state) {
+
+//   // Name of the index.
+//   $a5 = arg(5);
+
+//   foreach ($form['#facetapi']['facet_info'] as $facet_name => $facet) {
+//     $form['table']['operations'][$facet_name]["#links"][] = array(
+//       'title' => t('Merge options'),
+//       'href' => 'admin/config/search/facetapi/' . $a5 . "/" . $facet_name . "/merge",
+//     );
+//   }
+
+// }
+
+/**
+ * [facetapi_merge_options_settings_form description]
+ * @param  [type] $form       [description]
+ * @param  [type] $form_state [description]
+ * @param  [type] $facet_name [description]
+ * @return [type]             [description]
+ */
+// function facetapi_merge_options_settings_form($form, $form_state) {
+
+//   $index = arg(4);
+//   $field = arg(5);
+//   $searcher ="search_api@" . $index;
+//   $realm_name = "block";
+
+//   // $build = facetapi_build_realm($searcher, $realm_name);
+//   // $adapter = $build["#adapter"];
+//   // $keys = $adapter->getSearchKeys();
+//   // $items = $adapter->getAllActiveItems();
+
+//   // dpm($keys);
+//   $current = search_api_current_search();
+//   dpm($current);
+//   $adapter = facetapi_adapter_load($searcher);
+//   dpm($adapter);
+
+
+
+//   return $form;
+// }
+

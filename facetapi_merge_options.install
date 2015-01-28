@@ -1,0 +1,30 @@
+<?php
+/**
+ * @file
+ * Search API configuration and setup.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function facetapi_merge_options_install() {
+}
+
+/**
+ * Implements hook_enable().
+ */
+function facetapi_merge_options_enable() {
+
+}
+
+/**
+ * Implements hook_disable().
+ */
+function facetapi_merge_options_disable() {
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function facetapi_merge_options_uninstall() {
+}
