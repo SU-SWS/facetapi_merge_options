@@ -55,19 +55,20 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
 
       // Set some defaults from the first field to merge in the configuration.
       $first_field = $values['fields'][0];
-      $element[$element_name]["#path"] = $element[$first_field]['#path'];
-      $element[$element_name]["#query"] = $element[$first_field]['#query'];
+      $element[$element_name]["#path"] = @$element[$first_field]['#path'];
+      $element[$element_name]["#query"] = @$element[$first_field]['#query'];
 
       // Loop through the values and modify the query $f param.
       foreach ($values['fields'] as $element_key_name) {
+
         // Add up a running counter of the combined results.
-        $element[$element_name]["#count"] += $element[$element_key_name]['#count'];
+        $element[$element_name]["#count"] += @$element[$element_key_name]['#count'];
 
         // Easy way to find active state.
-        $element[$element_name]["#active"] = $element[$element_key_name]['#active'];
+        $element[$element_name]["#active"] = @$element[$element_key_name]['#active'];
 
         // Look and find the position in the array of the facet key.
-        $needle = $key . ":" . $element[$element_key_name]['#indexed_value'];
+        $needle = $key . ":" . $element_key_name;
         $haystack = @$element[$element_name]['#query']['f'];
 
         // No haystack. Just move along.
@@ -80,7 +81,7 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
 
         // If the element is active we want to remove the f entry so that the
         // filter is removed when the user clicks on the filter.
-        if ($element[$element_key_name]['#active']) {
+        if (!empty($element[$element_key_name]['#active'])) {
           // If the search found the entry we need to remove it.
           if ($pos !== FALSE) {
             unset($element[$element_name]['#query']['f'][$pos]);
@@ -94,6 +95,11 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
 
         // Finally, remove the original element from being rendered.
         unset($element[$element_key_name]);
+      }
+
+      // If no results go home!
+      if ($element[$element_name]["#count"] <= 0) {
+        unset($element[$element_name]);
       }
 
     }
@@ -140,9 +146,9 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
       ),
     );
 
-    $my_settings = $this->settings->settings['merge']['grouping'];
+    $my_settings = isset($this->settings->settings['merge']['grouping']) ? $this->settings->settings['merge']['grouping'] : array();
     if (empty($form_state['num_groups'])) {
-      $form_state['num_groups'] = count($this->settings->settings['merge']['grouping']);
+      $form_state['num_groups'] = count($my_settings);
     }
 
     for ($delta = 0; $delta <= $form_state['num_groups']; $delta++) {
