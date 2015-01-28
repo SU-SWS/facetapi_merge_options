@@ -1,7 +1,7 @@
 #[FacetAPI Merge Options](https://github.com/SU-SWS/facetapi_merge_options)
 ##### Version: 7.x-1.x
 
-Maintainers: [jbickar](https://github.com/jbickar), [sherakama](https://github.com/sherakama)
+Maintainers: [jbickar](https://github.com/jbickar), [sherakama](https://github.com/sherakama)   
 [Changelog.txt](CHANGELOG.txt)
 
 A bonus contrib module that allows one to merge two or more facet result options into a single link.
