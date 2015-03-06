@@ -32,15 +32,6 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
       parent::execute();
       return;
     }
-    // $merge_settings = array(
-    //   'merged_option_content_types' => array(
-    //     "markup" => "Articles and pages",
-    //     "fields" => array(
-    //       'article',
-    //       'page',
-    //     ),
-    //   ),
-    // );
 
     $raw_settings = $this->settings->settings['merge']['grouping'];
     $merge_settings = $this->prepareMergeSettings($raw_settings);
@@ -120,11 +111,13 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
    * Overrides FacetapiWidgetLinks::settingsForm().
    */
   function settingsForm(&$form, &$form_state) {
+
     parent::settingsForm($form, $form_state);
 
     if (!isset($form['#submit']) || is_array($form['#submit'])) {
       $form['#submit'] = array();
     }
+
     array_unshift($form["#submit"], "facetapi_merge_options_settings_form_submit");
 
     $form['merge'] = array(
@@ -147,19 +140,32 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
     );
 
     $my_settings = isset($this->settings->settings['merge']['grouping']) ? $this->settings->settings['merge']['grouping'] : array();
+
+    // Number of groupings
     if (empty($form_state['num_groups'])) {
       $form_state['num_groups'] = count($my_settings);
     }
 
     for ($delta = 0; $delta <= $form_state['num_groups']; $delta++) {
 
+      if (isset($form_state['merge_values'][$delta])) {
+        $beta = $form_state['merge_values'][$delta];
+      }
+      else {
+        // Minus 2 because of the label field and the add another field.
+        $beta = isset($my_settings[$delta]) ? count($my_settings[$delta]) - 2 : 2;
+      }
+
+      // Number of group options.
       $form['merge']['grouping'][$delta] = array(
         '#type' => 'fieldset',
         '#title' => t('Merge grouping #') . ($delta + 1),
         '#collapsed' => FALSE,
         '#collapsible' => TRUE,
+        '#id' => "edit-grouping-" . $delta,
       );
 
+      // Mandatory labels.
       $form['merge']['grouping'][$delta]['link_label'] = array(
         '#type' => 'textfield',
         '#title' => t('Label for the link'),
@@ -167,24 +173,31 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
         '#default_value' => isset($my_settings[$delta]['link_label']) ? $my_settings[$delta]['link_label'] : "",
       );
 
-      $form['merge']['grouping'][$delta]['merge_value_1'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Merge option 1'),
-        '#description' => t("Select the value to be merged into"),
-        '#default_value' => isset($my_settings[$delta]['merge_value_1']) ? $my_settings[$delta]['merge_value_1'] : "",
+      for ($count = 1; $count <= $beta; $count++) {
+        $form['merge']['grouping'][$delta]['merge_value_' . $count] = array(
+          '#type' => 'textfield',
+          '#title' => t('Merge option ') . $count,
+          '#description' => t("Select the value to be merged into"),
+          '#default_value' => isset($my_settings[$delta]['merge_value_' . $count]) ? $my_settings[$delta]['merge_value_' . $count] : "",
+        );
+      }
+
+      $form['merge']['grouping'][$delta]['add_nuther_value'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add another option'),
+        '#name' => 'add-nuther-value' . $delta,
+        '#submit' => array('facetapi_merge_options_add_nuther_value'),
+        '#ajax' => array(
+          'callback' => 'facetapi_merge_options_add_nuther_value_callback',
+          'wrapper' => 'edit-grouping-' . $delta,
+        ),
       );
 
-      $form['merge']['grouping'][$delta]['merge_value_2'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Merge option 2'),
-        '#description' => t("Merge this value with option 1"),
-        '#default_value' => isset($my_settings[$delta]['merge_value_2']) ? $my_settings[$delta]['merge_value_2'] : "",
-      );
     }
 
     $form['merge']['add_nuther'] = array(
       '#type' => 'submit',
-      '#value' => t('Add one more'),
+      '#value' => t('Add another grouping'),
       '#name' => 'add-nuther' . $delta,
       '#submit' => array('facetapi_merge_options_add_nuther'),
       '#ajax' => array(
@@ -226,8 +239,14 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
       $name = "merge_" . md5(serialize($values));
       $settings[$name]['markup'] = $values['link_label'];
       $settings[$name]['fields'] = array();
-      $settings[$name]['fields'][] = $values['merge_value_1'];
-      $settings[$name]['fields'][] = $values['merge_value_2'];
+      unset($values['link_label']);
+      unset($values['add_nuther_value']);
+      foreach ($values as $k => $field_value) {
+        if (empty($field_value)) {
+          continue;
+        }
+        $settings[$name]['fields'][] = $field_value;
+      }
     }
 
     return $settings;
