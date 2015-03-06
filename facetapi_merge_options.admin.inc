@@ -58,9 +58,12 @@ function facetapi_merge_options_settings_form_submit($form, &$form_state) {
     if (empty($settings['link_label'])) {
       unset($form_state['values']['merge']['grouping'][$delta]);
     }
-    foreach ($form_state['values']['merge']['grouping'][$delta] as $k => $value) {
-      if (empty($value)) {
-        unset($form_state['values']['merge']['grouping'][$delta][$k]);
+    $group = isset($form_state['values']['merge']['grouping'][$delta]) ? $form_state['values']['merge']['grouping'][$delta] : FALSE;
+    if ($group) {
+      foreach ($group as $k => $value) {
+        if (empty($value)) {
+          unset($form_state['values']['merge']['grouping'][$delta][$k]);
+        }
       }
     }
   }
