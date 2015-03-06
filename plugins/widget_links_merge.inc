@@ -45,7 +45,16 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
       $element[$element_name]['#markup'] = $values['markup'];
 
       // Set some defaults from the first field to merge in the configuration.
-      $first_field = $values['fields'][0];
+      // $first_field = $values['fields'][0];
+      // $element[$element_name]["#path"] = @$element[$first_field]['#path'];
+      // $element[$element_name]["#query"] = @$element[$first_field]['#query'];
+
+      $i = 0;
+      while(!isset($element[$values['fields'][$i]])){
+        $i++;
+      }
+
+      $first_field = $values['fields'][$i];
       $element[$element_name]["#path"] = @$element[$first_field]['#path'];
       $element[$element_name]["#query"] = @$element[$first_field]['#query'];
 
