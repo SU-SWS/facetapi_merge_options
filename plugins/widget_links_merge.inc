@@ -58,6 +58,7 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
         $i++;
       }
 
+      // If still no field then render and die.
       if (!$first_field) {
         parent::execute();
         return;
