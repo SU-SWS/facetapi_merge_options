@@ -38,23 +38,36 @@ class FacetapiWidgetLinksMerge extends FacetapiWidgetLinks {
 
     foreach ($merge_settings as $element_name => $values) {
 
-      // Create a new element for our merged field.
-      $element[$element_name] = $this->getElementPlaceholder();
-
-      // Place the label directly.
-      $element[$element_name]['#markup'] = $values['markup'];
-
       // Set some defaults from the first field to merge in the configuration.
       // $first_field = $values['fields'][0];
       // $element[$element_name]["#path"] = @$element[$first_field]['#path'];
       // $element[$element_name]["#query"] = @$element[$first_field]['#query'];
 
+      if (count($values['fields']) <= 0) {
+        parent::execute();
+        return;
+      }
+
       $i = 0;
-      while(!isset($element[$values['fields'][$i]])){
+      $first_field = NULL;
+      while(isset($values['fields'][$i])){
+        if (isset($element[$values['fields'][$i]])) {
+          $first_field = $values['fields'][$i];
+          continue;
+        }
         $i++;
       }
 
-      $first_field = $values['fields'][$i];
+      if (!$first_field) {
+        parent::execute();
+        return;
+      }
+
+      // Create a new element for our merged field.
+      $element[$element_name] = $this->getElementPlaceholder();
+
+      // Place the label directly.
+      $element[$element_name]['#markup'] = $values['markup'];
       $element[$element_name]["#path"] = @$element[$first_field]['#path'];
       $element[$element_name]["#query"] = @$element[$first_field]['#query'];
 
